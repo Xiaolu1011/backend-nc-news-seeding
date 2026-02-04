@@ -142,81 +142,81 @@ const seed = async ({ topicData, userData, articleData, commentData }) => {
     }),
   );
 
-  const emojiData = ["🔥", "😂", "💡", "❤️", "👀"];
-  const { rows: insertedEmojis } = await db.query(
-    `
-  INSERT INTO emojis (emoji)
-  SELECT UNNEST($1::varchar[])
-  RETURNING emoji_id, emoji;
-  `,
-    [emojiData],
-  );
+  // const emojiData = ["🔥", "😂", "💡", "❤️", "👀"];
+  // const { rows: insertedEmojis } = await db.query(
+  //   `
+  // INSERT INTO emojis (emoji)
+  // SELECT UNNEST($1::varchar[])
+  // RETURNING emoji_id, emoji;
+  // `,
+  //   [emojiData],
+  // );
 
-  const emojiToId = {};
-  insertedEmojis.forEach((e) => {
-    emojiToId[e.emoji] = e.emoji_id;
-  });
+  // const emojiToId = {};
+  // insertedEmojis.forEach((e) => {
+  //   emojiToId[e.emoji] = e.emoji_id;
+  // });
 
-  // We’ll refer to articles by title, then convert to article_id using titleToId
-  const reactionData = [
-    {
-      emoji: "🔥",
-      username: "grumpy19",
-      article_title: "Living in the shadow of a great man",
-    },
-    {
-      emoji: "😂",
-      username: "butter_bridge",
-      article_title: "Living in the shadow of a great man",
-    },
-    {
-      emoji: "❤️",
-      username: "icellusedkars",
-      article_title: "Living in the shadow of a great man",
-    },
+  // // We’ll refer to articles by title, then convert to article_id using titleToId
+  // const reactionData = [
+  //   {
+  //     emoji: "🔥",
+  //     username: "grumpy19",
+  //     article_title: "Living in the shadow of a great man",
+  //   },
+  //   {
+  //     emoji: "😂",
+  //     username: "butter_bridge",
+  //     article_title: "Living in the shadow of a great man",
+  //   },
+  //   {
+  //     emoji: "❤️",
+  //     username: "icellusedkars",
+  //     article_title: "Living in the shadow of a great man",
+  //   },
 
-    {
-      emoji: "👀",
-      username: "grumpy19",
-      article_title: "Eight pug gifs that remind me of mitch",
-    },
-    {
-      emoji: "😂",
-      username: "rogersop",
-      article_title: "Eight pug gifs that remind me of mitch",
-    },
+  //   {
+  //     emoji: "👀",
+  //     username: "grumpy19",
+  //     article_title: "Eight pug gifs that remind me of mitch",
+  //   },
+  //   {
+  //     emoji: "😂",
+  //     username: "rogersop",
+  //     article_title: "Eight pug gifs that remind me of mitch",
+  //   },
 
-    { emoji: "💡", username: "rogersop", article_title: "Student SUES Mitch!" },
-    {
-      emoji: "🔥",
-      username: "icellusedkars",
-      article_title: "Student SUES Mitch!",
-    },
-  ];
+  //   { emoji: "💡", username: "rogersop", article_title: "Student SUES Mitch!" },
+  //   {
+  //     emoji: "🔥",
+  //     username: "icellusedkars",
+  //     article_title: "Student SUES Mitch!",
+  //   },
+  // ];
 
-  await Promise.all(
-    reactionData.map((reaction) => {
-      const emoji_id = emojiToId[reaction.emoji];
-      const article_id = titleToId[reaction.article_title];
+  // await Promise.all(
+  //   reactionData.map((reaction) => {
+  //     const emoji_id = emojiToId[reaction.emoji];
+  //     const article_id = titleToId[reaction.article_title];
 
-      if (!emoji_id) {
-        throw new Error(`Emoji not found in emojis table: ${reaction.emoji}`);
-      }
-      if (!article_id) {
-        throw new Error(
-          `Article title not found in articles table: ${reaction.article_title}`,
-        );
-      }
+  //     if (!emoji_id) {
+  //       throw new Error(`Emoji not found in emojis table: ${reaction.emoji}`);
+  //     }
+  //     if (!article_id) {
+  //       throw new Error(
+  //         `Article title not found in articles table: ${reaction.article_title}`,
+  //       );
+  //     }
 
-      return db.query(
-        `
-      INSERT INTO emoji_article_user (emoji_id, username, article_id)
-      VALUES ($1, $2, $3);
-      `,
-        [emoji_id, reaction.username, article_id],
-      );
-    }),
-  );
+  //     return db.query(
+  //       `
+  //     INSERT INTO emoji_article_user (emoji_id, username, article_id)
+  //     VALUES ($1, $2, $3);
+  //     `,
+  //       [emoji_id, reaction.username, article_id],
+  //     );
+  //   }),
+  // );
 };
 
 module.exports = seed;
