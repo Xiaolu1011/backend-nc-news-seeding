@@ -35,6 +35,15 @@ const runQueries = async () => {
     );
     console.log("\nCOMMENTS WITH MORE THAN 10 VOTES:");
     console.log(popularComments.rows);
+
+    const result = await db.query(`
+  SELECT a.title, COUNT(*)::int AS reaction_count
+  FROM emoji_article_user eau
+  JOIN articles a ON eau.article_id = a.article_id
+  GROUP BY a.title
+  ORDER BY reaction_count DESC;
+`);
+    console.log(result.rows);
   } catch (err) {
     console.log("ERROR:", err);
   } finally {
