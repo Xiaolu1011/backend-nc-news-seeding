@@ -145,3 +145,75 @@ describe("GET /api/articles/:article_id/comments", () => {
     expect(body).toEqual({ msg: "Not found" });
   });
 });
+
+// Task 6 Post
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: posts a comment and responds with the posted comment", async () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a brand new comment!",
+    };
+
+    const { body } = await request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201);
+
+    expect(body).toHaveProperty("comment");
+    expect(body.comment).toEqual(
+      expect.objectContaining({
+        comment_id: expect.any(Number),
+        votes: expect.any(Number),
+        created_at: expect.any(String),
+        author: "butter_bridge",
+        body: "This is a brand new comment!",
+        article_id: 1,
+      }),
+    );
+  });
+
+  test("400: responds with Bad request when article_id is not a number", async () => {
+    const { body } = await request(app)
+      .post("/api/articles/not-a-number/comments")
+      .send({ username: "butter_bridge", body: "hello" })
+      .expect(400);
+
+    expect(body).toEqual({ msg: "Bad request" });
+  });
+
+  test("400: responds with Bad request when request body is missing username", async () => {
+    const { body } = await request(app)
+      .post("/api/articles/1/comments")
+      .send({ body: "hello" })
+      .expect(400);
+
+    expect(body).toEqual({ msg: "Bad request" });
+  });
+
+  test("400: responds with Bad request when request body is missing body", async () => {
+    const { body } = await request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "butter_bridge" })
+      .expect(400);
+
+    expect(body).toEqual({ msg: "Bad request" });
+  });
+
+  test("404: responds with Not found when article_id does not exist", async () => {
+    const { body } = await request(app)
+      .post("/api/articles/999999/comments")
+      .send({ username: "butter_bridge", body: "hello" })
+      .expect(404);
+
+    expect(body).toEqual({ msg: "Not found" });
+  });
+
+  test("404: responds with Not found when username does not exist", async () => {
+    const { body } = await request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "not-a-real-user", body: "hello" })
+      .expect(404);
+
+    expect(body).toEqual({ msg: "Not found" });
+  });
+});

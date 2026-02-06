@@ -61,3 +61,16 @@ exports.selectCommentsByArticleId = async (article_id) => {
 
   return rows;
 };
+
+exports.insertCommentByArticleId = async (article_id, username, body) => {
+  if (!username || !body) {
+    throw { status: 400, msg: "Bad request" };
+  }
+  const queryStr = `
+    INSERT INTO comments (author, body, article_id)
+    VALUES ($1, $2, $3)
+    RETURNING comment_id, votes, created_at, author, body, article_id;
+  `;
+  const { rows } = await db.query(queryStr, [username, body, article_id]);
+  return rows[0];
+};
