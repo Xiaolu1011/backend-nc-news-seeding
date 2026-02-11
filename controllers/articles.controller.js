@@ -3,11 +3,21 @@ const {
   selectArticleById,
   selectCommentsByArticleId,
   insertCommentByArticleId,
+  updateArticleVotes,
 } = require("../models/articles.model");
 
+// exports.getArticles = async (req, res, next) => {
+//   try {
+//     const articles = await selectArticles();
+//     res.status(200).send({ articles });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 exports.getArticles = async (req, res, next) => {
   try {
-    const articles = await selectArticles();
+    const { sort_by, order } = req.query;
+    const articles = await selectArticles(sort_by, order);
     res.status(200).send({ articles });
   } catch (err) {
     next(err);
@@ -41,6 +51,18 @@ exports.postCommentByArticleId = async (req, res, next) => {
 
     const comment = await insertCommentByArticleId(article_id, username, body);
     res.status(201).send({ comment });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.patchArticleById = async (req, res, next) => {
+  try {
+    const { article_id } = req.params;
+    const { inc_votes } = req.body;
+
+    const article = await updateArticleVotes(article_id, inc_votes);
+    res.status(200).send({ article });
   } catch (err) {
     next(err);
   }

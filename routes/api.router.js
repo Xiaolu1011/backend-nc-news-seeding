@@ -8,4 +8,7 @@ apiRouter.use("/articles", articlesRouter);
 const usersRouter = require("./users.router");
 apiRouter.use("/users", usersRouter);
 
+const commentsRouter = require("./comments.router");
+apiRouter.use("/comments", commentsRouter);
+
 module.exports = apiRouter;

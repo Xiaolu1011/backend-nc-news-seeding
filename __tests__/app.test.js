@@ -217,3 +217,141 @@ describe("POST /api/articles/:article_id/comments", () => {
     expect(body).toEqual({ msg: "Not found" });
   });
 });
+
+// Task 7 Patch
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: updates article votes by inc_votes and responds with updated article", async () => {
+    const { body } = await request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 1 })
+      .expect(200);
+
+    expect(body).toHaveProperty("article");
+    expect(body.article).toEqual(
+      expect.objectContaining({
+        article_id: 1,
+        votes: expect.any(Number),
+      }),
+    );
+  });
+
+  test("200: can decrement votes with a negative inc_votes", async () => {
+    const { body } = await request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -100 })
+      .expect(200);
+
+    expect(body.article).toEqual(
+      expect.objectContaining({
+        article_id: 1,
+        votes: expect.any(Number),
+      }),
+    );
+  });
+
+  test("400: responds with Bad request when article_id is not a number", async () => {
+    const { body } = await request(app)
+      .patch("/api/articles/not-a-number")
+      .send({ inc_votes: 1 })
+      .expect(400);
+
+    expect(body).toEqual({ msg: "Bad request" });
+  });
+
+  test("404: responds with Not found when article_id does not exist", async () => {
+    const { body } = await request(app)
+      .patch("/api/articles/999999")
+      .send({ inc_votes: 1 })
+      .expect(404);
+
+    expect(body).toEqual({ msg: "Not found" });
+  });
+
+  test("400: responds with Bad request when request body is missing inc_votes", async () => {
+    const { body } = await request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400);
+
+    expect(body).toEqual({ msg: "Bad request" });
+  });
+
+  test("400: responds with Bad request when inc_votes is not a number", async () => {
+    const { body } = await request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "one" })
+      .expect(400);
+
+    expect(body).toEqual({ msg: "Bad request" });
+  });
+});
+
+// Task 8 DELETE
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: deletes the comment and responds with no content", async () => {
+    // First delete should succeed
+    await request(app).delete("/api/comments/1").expect(204);
+
+    // Second delete should now 404 (because it's gone)
+    const { body } = await request(app).delete("/api/comments/1").expect(404);
+
+    expect(body).toEqual({ msg: "Not found" });
+  });
+
+  test("400: responds with Bad request when comment_id is not a number", async () => {
+    const { body } = await request(app)
+      .delete("/api/comments/not-a-number")
+      .expect(400);
+
+    expect(body).toEqual({ msg: "Bad request" });
+  });
+
+  test("404: responds with Not found when comment_id does not exist", async () => {
+    const { body } = await request(app)
+      .delete("/api/comments/999999")
+      .expect(404);
+
+    expect(body).toEqual({ msg: "Not found" });
+  });
+});
+
+// Task 9 GET Sort
+describe("GET /api/articles (sorting queries)", () => {
+  test("200: sorts articles by a valid sort_by column", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200);
+
+    const votes = body.articles.map((a) => a.votes);
+    for (let i = 0; i < votes.length - 1; i++) {
+      expect(votes[i]).toBeGreaterThanOrEqual(votes[i + 1]);
+    }
+  });
+
+  test("200: sorts articles by a valid sort_by column and order=asc", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=votes&order=asc")
+      .expect(200);
+
+    const votes = body.articles.map((a) => a.votes);
+    for (let i = 0; i < votes.length - 1; i++) {
+      expect(votes[i]).toBeLessThanOrEqual(votes[i + 1]);
+    }
+  });
+
+  test("400: responds with Bad request when sort_by is invalid", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?sort_by=notAColumn")
+      .expect(400);
+
+    expect(body).toEqual({ msg: "Bad request" });
+  });
+
+  test("400: responds with Bad request when order is invalid", async () => {
+    const { body } = await request(app)
+      .get("/api/articles?order=sideways")
+      .expect(400);
+
+    expect(body).toEqual({ msg: "Bad request" });
+  });
+});
