@@ -1,0 +1,14 @@
+{
+  "GET /api": {
+    "description": "List all available API endpoints"
+  },
+  "GET /api/topics": {
+    "description": "Get all topics"
+  },
+  "GET /api/articles": {
+    "description": "Get all articles"
+  },
+  "GET /api/users": {
+    "description": "Get all users"
+  }
+}
