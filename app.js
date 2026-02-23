@@ -9,14 +9,15 @@ const {
 
 const app = express();
 app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.status(200).send({ msg: "API running" });
+});
+
 app.use("/api", apiRouter);
 
 app.all("/*path", (req, res) => {
   res.status(404).send({ msg: "Path not found" });
-});
-
-app.get("/", (req, res) => {
-  res.status(200).send({ msg: "API running" });
 });
 
 app.use(handleCustomErrors);
