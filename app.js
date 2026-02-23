@@ -15,6 +15,10 @@ app.all("/*path", (req, res) => {
   res.status(404).send({ msg: "Path not found" });
 });
 
+app.get("/", (req, res) => {
+  res.status(200).send({ msg: "API running" });
+});
+
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);
 app.use(handleServerErrors);
