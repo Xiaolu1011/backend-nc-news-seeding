@@ -1,4 +1,9 @@
 const apiRouter = require("express").Router();
+
+apiRouter.get("/", (req, res) => {
+  res.status(200).send({ msg: "Welcome to the API" });
+});
+
 const topicsRouter = require("./topic.router");
 apiRouter.use("/topics", topicsRouter);
 
