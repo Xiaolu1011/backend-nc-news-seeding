@@ -41,8 +41,6 @@ const db = require("../db/connection");
 //   return rows;
 // };
 
-const db = require("../db/connection");
-
 exports.selectArticles = async (
   topic,
   sort_by = "created_at",

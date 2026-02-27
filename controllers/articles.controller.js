@@ -8,8 +8,8 @@ const {
 
 exports.getArticles = async (req, res, next) => {
   try {
-    const { sort_by, order } = req.query;
-    const articles = await selectArticles(sort_by, order);
+    const { topic, sort_by, order } = req.query;
+    const articles = await selectArticles(topic, sort_by, order);
     res.status(200).send({ articles });
   } catch (err) {
     next(err);
