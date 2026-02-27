@@ -1,6 +1,26 @@
 const db = require("../db/connection");
 
-// exports.selectArticles = async () => {
+// exports.selectArticles = async (sort_by = "created_at", order = "desc") => {
+//   const validSortBys = [
+//     "author",
+//     "title",
+//     "article_id",
+//     "topic",
+//     "created_at",
+//     "votes",
+//     "article_img_url",
+//     "comment_count",
+//   ];
+
+//   if (!validSortBys.includes(sort_by)) {
+//     throw { status: 400, msg: "Bad request" };
+//   }
+
+//   const normalizedOrder = order.toLowerCase();
+//   if (normalizedOrder !== "asc" && normalizedOrder !== "desc") {
+//     throw { status: 400, msg: "Bad request" };
+//   }
+
 //   const queryStr = `
 //     SELECT
 //       articles.author,
@@ -15,12 +35,19 @@ const db = require("../db/connection");
 //     LEFT JOIN comments
 //       ON comments.article_id = articles.article_id
 //     GROUP BY articles.article_id
-//     ORDER BY articles.created_at DESC;
+//     ORDER BY ${sort_by} ${normalizedOrder};
 //   `;
 //   const { rows } = await db.query(queryStr);
 //   return rows;
 // };
-exports.selectArticles = async (sort_by = "created_at", order = "desc") => {
+
+const db = require("../db/connection");
+
+exports.selectArticles = async (
+  topic,
+  sort_by = "created_at",
+  order = "desc",
+) => {
   const validSortBys = [
     "author",
     "title",
@@ -41,7 +68,8 @@ exports.selectArticles = async (sort_by = "created_at", order = "desc") => {
     throw { status: 400, msg: "Bad request" };
   }
 
-  const queryStr = `
+  const queryValues = [];
+  let queryStr = `
     SELECT 
       articles.author,
       articles.title,
@@ -54,10 +82,19 @@ exports.selectArticles = async (sort_by = "created_at", order = "desc") => {
     FROM articles
     LEFT JOIN comments
       ON comments.article_id = articles.article_id
+  `;
+
+  if (topic) {
+    queryValues.push(topic);
+    queryStr += ` WHERE articles.topic = $1`;
+  }
+
+  queryStr += `
     GROUP BY articles.article_id
     ORDER BY ${sort_by} ${normalizedOrder};
   `;
-  const { rows } = await db.query(queryStr);
+
+  const { rows } = await db.query(queryStr, queryValues);
   return rows;
 };
 
